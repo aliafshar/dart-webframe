@@ -1,0 +1,13 @@
+# Copyright (c) 2012, Google Inc
+
+name:         webframe
+version:      0.1.0
+author:       Ali Afshar <afshar@google.com>
+description:  Web framework for dart.
+homepage:     https://github.com/aliafshar/dart-webframe
+dependencies:
+  unittest: any
+  logging: any
+  signals: any
+  principal: any
+  routing: any
