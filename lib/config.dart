@@ -4,9 +4,9 @@ part of webframe;
 
 
 Map DEFAULT_OPTIONS = {
-  'debug': false,
+  'debug': true,
   'server_address': '0.0.0.0',
-  'server_port': 8081,
+  'server_port': 9091,
 };
 
 
@@ -23,7 +23,11 @@ class Config {
   }
 
   Config() {
-    DEFAULT_OPTIONS.forEach((k, v) => _options[k] = v);
+    update(DEFAULT_OPTIONS);
+  }
+
+  update(Map with) {
+    with.forEach((k, v) => _options[k] = v);
   }
 
   String toString() {
