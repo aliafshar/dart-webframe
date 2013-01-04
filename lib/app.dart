@@ -10,13 +10,12 @@ class Webframe {
   final Config config = new Config();
   final List<Future> waitingFor = [];
   final HttpServer server = new HttpServer();
-
-  final Signal onConfig = new Signal();
-  final Signal onAppSetup = new Signal();
-  final Signal onBeforeResponse = new Signal();
-  final Signal onRequest = new Signal();
-
   final RouteMap routes = new RouteMap();
+
+  final Signal<Config> onConfig = new Signal<Config>();
+  final Signal<RoundTrip> onRoundTrip = new Signal<RoundTrip>();
+  final Signal<Webframe> onApp = new Signal();
+
 
   Extensible extensions;
 
@@ -62,7 +61,7 @@ class Webframe {
   /**
    * Add a route to redirect from one URI to another.
    */
-  redirectRoute(String name, String from, String to) {
+  Route redirectRoute(String name, String from, String to) {
     return route(name, path: from, view: new RedirectView(to).call);
   }
 
@@ -96,7 +95,7 @@ class Webframe {
     server.defaultRequestHandler = dispatch;
     extensions.start().then((_) {
       waitingFor.add(onConfig.emit(config));
-      waitingFor.add(onAppSetup.emit(this));
+      waitingFor.add(onApp.emit(this));
       Futures.wait(waitingFor).then((_) {
         _start();
       });

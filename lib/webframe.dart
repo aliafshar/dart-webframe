@@ -7,6 +7,7 @@ library webframe;
 import 'dart:io';
 import 'dart:json';
 import 'package:logging/logging.dart';
+import 'package:principal/principal.dart';
 import 'package:routing/routing.dart';
 import 'package:roundtrip/roundtrip.dart';
 import 'package:signals/signals.dart';
