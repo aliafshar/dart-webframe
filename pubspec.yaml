@@ -8,6 +8,12 @@ homepage:     https://github.com/aliafshar/dart-webframe
 dependencies:
   unittest: any
   logging: any
-  signals: any
+  signals:
+    git: git://github.com/aliafshar/dart-signals.git
   principal: any
-  routing: any
+  routing:
+    git: git://github.com/aliafshar/dart-routing.git
+  roundtrip:
+    git: git://github.com/aliafshar/dart-roundtrip.git
+  extensions:
+    git: git://github.com/aliafshar/dart-extensions.git

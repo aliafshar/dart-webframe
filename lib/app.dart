@@ -1,44 +1,45 @@
-library app;
 
-import 'dart:io';
-import 'package:routing/routing.dart';
-import 'config.dart';
-import 'views.dart';
-import 'roundtrip.dart';
-import 'logging.dart';
+part of webframe;
 
-typedef Future DwfSetup(Dwf);
 
-class Dwf {
+typedef Future WebframeSetup(Webframe);
 
-  RouteMap routes;
-  Config config;
-  HttpServer server;
-  List<Future> setups = [];
 
-  Dwf([config]) {
+class Webframe {
+
+  final Config config = new Config();
+  final List<Future> waitingFor = [];
+  final HttpServer server = new HttpServer();
+
+  final Signal onConfig = new Signal();
+  final Signal onAppSetup = new Signal();
+  final Signal onBeforeResponse = new Signal();
+  final Signal onRequest = new Signal();
+
+  final RouteMap routes = new RouteMap();
+
+  Extensible extensions;
+
+  Webframe() {
+
     initLogging();
-    LOG.fine('Log started.');
-    routes = new RouteMap();
-    this.config = ?config ? config : new Config();
+    LOG.fine('Started log.');
+    extensions = new Extensible(this);
     routes.views['__static__'] = staticView;
-    server = createServer();
   }
 
   /**
    * Add an extension to Dwf.
    */
-  setup(DwfSetup setup) {
-    var v = setup(this);
-    if (v is Future) {
-      setups.add(v);
-    }
+  dynamic setup(Extension setup) {
+    LOG.fine('Extending with $setup.');
+    return extensions.extend(setup);
   }
 
   /**
    * Add a named route to the application.
    */
-  route(name, {String path, dynamic method, Function view}) {
+  route(name, {String path, dynamic method, WebframeView view}) {
     var routePath = ?path ? new RoutePath.fromPath(path) : null;
     var routeMethod = ?method ? new RouteMethod.fromAnything(method) : null;
     routes.add(new Route(name, path: routePath, method: routeMethod));
@@ -55,52 +56,46 @@ class Dwf {
     routes.add(new Route(name, static: routeStatic));
   }
 
-  _getViewName(Function view) {
-    // var mirror = reflect(view);
-    // mirror.function.simpleName;
-    // Bad hack until the above code works.
-    return view.toString().split("'")[1];
-  }
-
   /**
    * Dispatch a single request to the first matched route, or respond with 404.
    */
   dispatch(HttpRequest request, HttpResponse response) {
+    logRequest(request);
     var matched = routes.match(request);
-    var ctx = new RoundTrip(request, response, matched);
-    var view = routes.findView(matched);
-    if (view != null) {
-      view(ctx);
+    var ctx = new RoundTrip(request, response);
+    if (matched == null) {
+      ctx.respondError(HttpStatus.NOT_FOUND);
     }
     else {
-      ctx.respondError(matched.isError ? matched.error : HttpStatus.NOT_FOUND);
+      matched.args.forEach((k, v) => ctx.matchArgs[k] = v);
+      LOG.fine('Match arguments ${ctx.matchArgs}');
+      var view = routes.findView(matched);
+      if (view == null) {
+        ctx.respondError(HttpStatus.NOT_FOUND);
+      }
+      else {
+        view(ctx);
+      }
     }
-  }
-
-  /**
-   * Creates an HTTP server with the appropriate configuration.
-   */
-  HttpServer createServer() {
-    var server = new HttpServer();
-    server.defaultRequestHandler = dispatch;
-    return server;
-  }
-
-  addExtension(void ext(Dwf app)) {
-    ext(this);
   }
 
   /**
    * Starts the HTTP server.
    */
   start() {
-    print(setups.length);
-    Futures.wait(setups).then((_) => _start());
+    server.defaultRequestHandler = dispatch;
+    extensions.start().then((_) {
+      waitingFor.add(onConfig.emit(config));
+      waitingFor.add(onAppSetup.emit(this));
+      Futures.wait(waitingFor).then((_) {
+        _start();
+      });
+    });
   }
 
   _start() {
-    server.listen(config.SERVER_ADDRESS, config.SERVER_PORT);
-    LOG.info('Started Dwf.');
+    server.listen(config.get('server_address'), config.get('server_port'));
+    LOG.info('Started Webframe.');
   }
 
 }
