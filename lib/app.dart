@@ -39,10 +39,11 @@ class Webframe {
   /**
    * Add a named route to the application.
    */
-  route(name, {String path, dynamic method, WebframeView view}) {
+  Route route(name, {String path, dynamic method, WebframeView view}) {
     var routePath = ?path ? new RoutePath.fromPath(path) : null;
     var routeMethod = ?method ? new RouteMethod.fromAnything(method) : null;
-    routes.add(new Route(name, path: routePath, method: routeMethod));
+    var route = new Route(name, path: routePath, method: routeMethod);
+    routes.add(route);
     if (view != null) {
       routes.views[name] = view;
     }
@@ -51,9 +52,18 @@ class Webframe {
   /**
    * Add a static route to the application.
    */
-  staticRoute(String name, String prefix, String path) {
+  Route staticRoute(String name, String prefix, String path) {
     var routeStatic = new RouteStatic(prefix, new Path(path));
-    routes.add(new Route(name, static: routeStatic));
+    var route = new Route(name, static: routeStatic);
+    routes.add(route);
+    return route;
+  }
+
+  /**
+   * Add a route to redirect from one URI to another.
+   */
+  redirectRoute(String name, String from, String to) {
+    return route(name, path: from, view: new RedirectView(to).call);
   }
 
   /**

@@ -17,11 +17,11 @@ class JsonService {
 
 
 setup(Webframe app) {
-  app.route('index', path: '/', view: new RedirectView('/index.html'));
-  app.route('humans', path: '/humans.txt', view: humans);
-  app.setup(new JsonService().setup);
-  app.setup(new DbExtension().setup);
-  app.staticRoute('__static__', '/', 'example/web');
+  app..redirectRoute('index', '/', '/index.html')
+     ..route('humans', path: '/humans.txt', view: humans)
+     ..setup(new JsonService().setup)
+     ..setup(new DbExtension().setup)
+     ..staticRoute('__static__', '/', 'example/web');
 }
 
 humans(RoundTrip r) => r.respond(body: 'Take me to your leader.');
