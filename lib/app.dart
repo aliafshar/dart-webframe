@@ -14,10 +14,13 @@ class Webframe {
 
   final Signal<Config> onConfig = new Signal<Config>();
   final Signal<RoundTrip> onRoundTrip = new Signal<RoundTrip>();
-  final Signal<Webframe> onApp = new Signal();
+  final Signal<Webframe> onApp = new Signal<Webframe>();
 
 
   Extensible extensions;
+
+  final Map<String, Permission> permissions = <Permission>{};
+  final Map<String, WebframeView> views = <WebframeView>{};
 
   Webframe() {
 
@@ -38,13 +41,20 @@ class Webframe {
   /**
    * Add a named route to the application.
    */
-  Route route(name, {String path, dynamic method, WebframeView view}) {
+  Route route(name, { String path
+                    , dynamic method
+                    , WebframeView view
+                    , Permission permission
+                    }) {
     var routePath = ?path ? new RoutePath.fromPath(path) : null;
     var routeMethod = ?method ? new RouteMethod.fromAnything(method) : null;
     var route = new Route(name, path: routePath, method: routeMethod);
     routes.add(route);
-    if (view != null) {
+    if (?view) {
       routes.views[name] = view;
+    }
+    if (?permission) {
+      permissions[name] = permission;
     }
   }
 
@@ -86,6 +96,23 @@ class Webframe {
         view(ctx);
       }
     }
+  }
+
+  /**
+   * Finds a view for a named route.
+   */
+  Function findView(RouteMatch m) {
+    var name;
+    if (m.isError) {
+      name = m.error.toString();
+    }
+    else if (m.isFile) {
+      name = '__static__';
+    }
+    else {
+      name = m.name;
+    }
+    return views[name];
   }
 
   /**
