@@ -30,6 +30,18 @@ class Config {
     with.forEach((k, v) => _options[k] = v);
   }
 
+  load(String filename) {
+    loadFile(new File(filename));
+  }
+
+  loadFile(File file) {
+    loadString(file.readAsStringSync());
+  }
+
+  loadString(String data) {
+    update(JSON.parse(data));
+  }
+
   String toString() {
     return _options.toString();
   }
