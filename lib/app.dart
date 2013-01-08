@@ -82,6 +82,7 @@ class Webframe {
     logRequest(request);
     var matched = routes.match(request);
     var ctx = new RoundTrip(request, response);
+    onRoundTrip.emit(ctx);
     if (matched == null) {
       ctx.respondError(HttpStatus.NOT_FOUND);
     }

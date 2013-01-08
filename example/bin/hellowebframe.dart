@@ -1,6 +1,7 @@
 
 import '../../lib/webframe.dart';
 import '../../lib/db.dart';
+import '../../lib/users.dart';
 
 
 class JsonService {
@@ -21,6 +22,7 @@ setup(Webframe app) {
      ..route('humans', path: '/humans.txt', view: humans)
      ..setup(new JsonService().setup)
      ..setup(new DbExtension().setup)
+     ..setup(new UsersExtension().setup)
      ..staticRoute('__static__', '/', 'example/web');
 }
 
