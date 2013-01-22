@@ -2,6 +2,7 @@
 part of webframe;
 
 
+
 typedef Future WebframeSetup(Webframe);
 
 
@@ -15,7 +16,6 @@ class Webframe {
   final Signal<Config> onConfig = new Signal<Config>();
   final Signal<RoundTrip> onRoundTrip = new Signal<RoundTrip>();
   final Signal<Webframe> onApp = new Signal();
-
 
   Extensible extensions;
 

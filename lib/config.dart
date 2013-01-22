@@ -26,8 +26,8 @@ class Config {
     update(DEFAULT_OPTIONS);
   }
 
-  update(Map with) {
-    with.forEach((k, v) => _options[k] = v);
+  update(Map from) {
+    from.forEach((k, v) => _options[k] = v);
   }
 
   String toString() {
