@@ -10,7 +10,6 @@ dependencies:
   logging: any
   signals:
     git: git://github.com/aliafshar/dart-signals.git
-  principal: any
   routing:
     git: git://github.com/aliafshar/dart-routing.git
   roundtrip:
