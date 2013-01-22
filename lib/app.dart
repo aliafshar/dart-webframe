@@ -124,7 +124,7 @@ class Webframe {
     extensions.start().then((_) {
       waitingFor.add(onConfig.emit(config));
       waitingFor.add(onApp.emit(this));
-      Futures.wait(waitingFor).then((_) {
+      Future.wait(waitingFor).then((_) {
         _start();
       });
     });
